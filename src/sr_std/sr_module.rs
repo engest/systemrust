@@ -1,20 +1,40 @@
 use crate::prelude::*;
-use crate::{SIM, SR_MAIN};
 
-//TODO Create static SRodule sr_main root module
-pub struct SRModule<'a> {
-    pub name: &'a str,
-    pub parent: Option<&'a SRModule<'a>>,
+type SRThread = fn();
+
+pub trait Render {
+    fn render(&self, indent: String);
 }
 
-impl<'a> SRModule<'a> {
-    pub fn new(name: &'a str, parent: Option<&'a SRModule>) -> Self {
-        let s = Self {
+pub struct SRModule {
+    pub name: String,
+    pub parent: Option<Box<SRModule>>,
+    pub children: Vec<Box<SRModule>>,
+    pub threads: Vec<SRThread>,
+}
+
+impl SRModule {
+    pub fn new(name: String, parent: Option<Box<SRModule>>) -> Self {
+        Self {
             name,
             parent,
-        };
-        //SIM.modules.append(&s);
-        s
+            children: vec![],
+            threads: vec![],
+        }
     }
 }
 
+impl Render for SRModule {
+    fn render(&self, indent: String) {
+        let indent_local = indent + "  ";
+        println!("{}Module: {}", indent_local.as_str(), &self.name);
+        if !&self.children.is_empty() {
+            for c in &self.children {
+                println!("{}child: {}", indent_local.as_str(), c.name);
+                c.render(indent_local.as_str().to_string());
+            }
+        } else {
+            println!("{}no children", indent_local.as_str());
+        }
+    }
+}

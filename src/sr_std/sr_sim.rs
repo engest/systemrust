@@ -1,20 +1,27 @@
 use crate::prelude::*;
 
 pub struct SRSim<'a> {
-    pub root_module: &'a SRModule<'a>,
-    pub modules: Vec<&'a SRModule<'a>>,
+    pub root_module: &'a Box<SRModule>,
+    // pub modules: Vec<Box<SRModule>>,
 }
 
-impl<'a> SRSim<'a> {
+impl SRSim {
     pub fn start_sim(&self) {
         println!("Starting simulation with root module: {}", self.root_module.name);
-        let pm = self.root_module.parent;
-        match pm {
-            Some(p) => {
-                println!("This not a root module!");
-            },
-            None => {
-                println!("This is indeed a root module!");
+        println!("---------------------------");
+        println!("| Initializing system...  |");
+        println!("---------------------------");
+        self.root_module.render("".to_string());
+        println!("---------------------------");
+        println!("| Starting Simulation...  |");
+        println!("---------------------------");
+        for i in 1..10 {
+            for c in &self.root_module.children {
+                println!("Giving module {} some time...", c.name);
+                for t in &c.threads {
+                    println!("This is where I would call a thread...");
+                    t();
+                }
             }
         }
     }
